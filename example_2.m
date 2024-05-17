@@ -12,7 +12,7 @@ data = analytical_solution(n_samples_x, k, r, c, f);
 % sDMD is reasonable for very few samples. Otherwise basic DMD seems to
 % converge faster and is less complicated
 train_size = floor(0.1*size(data, 2));
-% train_size = 2;
+train_size = 2;
 %% train-test split:
 train_data = data(:, 1:train_size);
 test_data = data(:, train_size+1:end);
@@ -91,6 +91,35 @@ imagesc(err3)
 clim([minval, maxval])
 title("basic DMD")
 %%
+figure()
+fd_system = md_fd_system(n_samples_x, k, r, c, f);
+maxval = max(max([fd_system, A_sdmd]));
+minval = min(min([fd_system, A_sdmd]));
+subplot(1,3,1)
+imagesc(fd_system)
+clim([minval, maxval])
+title("fin.-diff. system")
+subplot(1,3,2)
+imagesc(A_sdmd)
+clim([minval, maxval])
+title("sDMD system")
+subplot(1,3,3)
+imagesc(A_sdmd-fd_system)
+clim([minval, maxval])
+title("difference")
+disp(" ")
+disp(['"error" (or rather difference) between modelled system and "learned" system: ', num2str(norm((fd_system-A_sdmd)./(fd_system + 1e-16)))]);
+%%
 function Z = pred_error_visu(true, pred)
     Z = log(abs((true-pred)./(true+1e-16)));
+end
+function system = md_fd_system(N, k, rho, c, f)
+    L = 1; % length
+    dx = L/(N-1); % spatial sampling
+    a = k/(rho*c);
+    dt = f*(dx^2/(2*a)); % => dt < dx^2/(2*a) % same (!) as in analytical_solution.m
+    D = full(gallery('tridiag',N,1,-2,1));
+    D(1,2) = 2;
+    D(N,N-1) = 2;    
+    system = dt*(a/dx * D)/dx + eye(N);
 end

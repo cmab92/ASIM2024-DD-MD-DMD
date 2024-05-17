@@ -1,15 +1,12 @@
-function data = analytical_solution(n_samples_x)
-    lambda = 401; % thermal conductivity
-    cap = 385; % specific heat capacity
-    rho = 8.96; % mass density
-    a = lambda / (cap*rho); % diffusivity
+function data = analytical_solution(n_samples_x, k, r, c, f)
+    a = k / (r*c); % diffusivity
     
     L = 1; % length
     N = n_samples_x; % spatial sampling points
     dx = L/(N-1); % spatial sampling
     xgrid = 0 : dx : L; % Position in x-direction
     
-    dt = 1/2*(dx^2/(2*a)); % => dt < dx^2/(2*a)
+    dt = f*(dx^2/(2*a)); % => dt < dx^2/(2*a)
     Tf = 1;
     t_samp = dt;
     tgrid = 0 : t_samp : Tf;
