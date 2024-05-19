@@ -11,8 +11,8 @@ data = analytical_solution(n_samples_x, k, r, c, f);
 %% num of train-samples??
 % sDMD is reasonable for very few samples. Otherwise basic DMD seems to
 % converge faster and is less complicated
-train_size = floor(0.1*size(data, 2));
-train_size = 2;
+train_size = floor(0.9*size(data, 2));
+% train_size = 2;
 %% train-test split:
 train_data = data(:, 1:train_size);
 test_data = data(:, train_size+1:end);
