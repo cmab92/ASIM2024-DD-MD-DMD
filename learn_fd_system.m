@@ -2,43 +2,51 @@ close all; clear all; clc;
 %%
 rng(1);
 %% gen. data
-n_samples_x = 21;
+n_samples_x = 17;
 k = 401; % thermal conductivity
 c = 385; % specific heat capacity
 r = 8.96; % mass density    
-f = 5.9;            % fummelkonstante space-time-discretization
+f = 0.125;            % fummelkonstante space-time-discretization (should be smaller than 1)
 data = analytical_solution(n_samples_x, k, r, c, f);
+size(data)
 %% num of train-samples??
 % sDMD is reasonable for very few samples. Otherwise basic DMD seems to
 % converge faster and is less complicated
 fd_system = md_fd_system(n_samples_x, k, r, c, f);
 
-for train_size = 1:size(data, 2)-1
+for idx = 1:size(data, 2)-1
     %% train-test split:
-    train_data = data(:, 1:train_size+1);
-    test_data = data(:, train_size+2:end);
+    train_size = idx+1;
+    train_data = data(:, 1:train_size);
+    test_data = data(:, train_size+1:end);
     X1 = train_data(:, 1:end-1);
     X2 = train_data(:, 2:end);
     %% sDMD
     A_sdmd = vanilla_fd_DMD(X1, X2);
     %% basic DMD
     [U, S, V] = svd(X1);
-    r = min(size(X1));
+    threshold = optimal_SVHT_coef(min(size(X1, 1)/size(X1, 2), 1), 0)*median(diag(S));
+    r = sum(diag(S)>threshold);
     A_dmd = X2*V(:, 1:r)*pinv(S(1:r, 1:r))*U(:, 1:r)';
     %%
     [A_pidmd, varargout] = piDMD(X1, X2, "diagonalpinv", 2);
     A_pidmd = A_pidmd(eye(size(train_data, 1)));
     %%
-    error_sdmd(train_size) = norm(fd_system - A_sdmd, 'fro');
-    error_pidmd(train_size) = norm(fd_system - A_pidmd, 'fro');
-    error_dmd(train_size) = norm(fd_system - A_dmd, 'fro');
+    error_sdmd(idx) = norm(fd_system - A_sdmd, 'fro');
+    error_pidmd(idx) = norm(fd_system - A_pidmd, 'fro');
+    error_dmd(idx) = norm(fd_system - A_dmd, 'fro');
 end
 %%
 figure()
-plot(error_dmd, 'Displayname', 'DMD'), hold on;
+subplot(3,1,1)
+plot(error_dmd, 'Displayname', 'DMD');
+title("DMD")
+subplot(3,1,2)
 plot(error_pidmd, 'Displayname', 'piDMD');
+title("piDMD")
+subplot(3,1,3)
 plot(error_sdmd, 'Displayname', 'sDMD');
-legend()
+title("sDMD")
 %% 
 figure()
 maxval = max(max([fd_system, A_sdmd]));
