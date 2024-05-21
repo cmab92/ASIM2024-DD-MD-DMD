@@ -6,13 +6,13 @@ n_samples_x = 21;
 k = 401; % thermal conductivity
 c = 385; % specific heat capacity
 r = 8.96; % mass density    
-f = 1/2;            % fummelkonstante space-time-discretization
+f = 0.1;            % fummelkonstante space-time-discretization
 data = analytical_solution(n_samples_x, k, r, c, f);
 %% num of train-samples??
 % sDMD is reasonable for very few samples. Otherwise basic DMD seems to
 % converge faster and is less complicated
-train_size = floor(0.9*size(data, 2));
-% train_size = 2;
+train_size = floor(0.25*size(data, 2));
+train_size = 2;
 %% train-test split:
 train_data = data(:, 1:train_size);
 test_data = data(:, train_size+1:end);
