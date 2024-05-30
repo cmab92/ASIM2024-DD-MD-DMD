@@ -3,11 +3,13 @@ close all; clear all; clc;
 rng(1);
 %% gen. data
 n_samples_x = 21;
-k = 401; % thermal conductivity
-c = 385; % specific heat capacity
-r = 8.96; % mass density    
+k = 401;  % W/(m*K) thermal conductivity (copper)
+c = 385;  % J/(kg*K) specific thermal capacity (copper)
+r = 8.96; % kg/(m^3), mass density (copper)    
+a = k/(r*c); % diffusivity constant
 f = 1/2;            % fummelkonstante space-time-discretization
-data = analytical_solution(n_samples_x, k, r, c, f);
+init_func = @(x) (x-x.^2);
+data = analytical_solution(n_samples_x, a, f, init_func);
 %% num of train-samples??
 % sDMD is reasonable for very few samples. Otherwise basic DMD seems to
 % converge faster and is less complicated

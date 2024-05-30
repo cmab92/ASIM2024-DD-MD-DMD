@@ -1,29 +1,26 @@
-function data = analytical_solution(n_samples_x, k, r, c, f)
-    a = k / (r*c); % diffusivity
-    
+function data = analytical_solution(N, a, f, init)
+
     L = 1; % length
-    N = n_samples_x; % spatial sampling points
-    dx = L/(N-1); % spatial sampling
-    xgrid = 0 : dx : L; % Position in x-direction
-    
-    dt = f*(dx^2/(2*a)); % => dt < dx^2/(2*a)
+    xgrid = linspace(0, L, N);
+    dx = xgrid(2); % spatial sampling
+
+    dt = f*(dx^2/(2*a)); % =>  1/2 > (dt*a)/dx^2 (see Colaco, p.180, eq. 5.138b) 5.139 b
     Tf = 1;
-    t_samp = dt;
-    tgrid = 0 : t_samp : Tf;
-    
-    data = zeros(length(xgrid), length(tgrid));
-    for i = 1:length(tgrid)
-        td = tgrid(i);
-        for j = 1:length(xgrid)
-            xd = xgrid(j);
-            c0 = L^2 / 6;
-            c1 = L^2 / pi^2;
-            s = 0;
-            kmax = 2;
-            for k = 1:kmax
-                s = s + exp(-4*a*(k*pi/L)^2*td)*cos(2*k*pi*xd/L) / k^2;
-            end
-            data(j, i) = c0 - c1*s;
-        end
+
+    [tt, xx] = meshgrid((0:dt:Tf), xgrid);
+
+    %% 
+    n_coeffs = 5000;
+    sample = linspace(0,1,n_coeffs);
+    init_val = init(sample);
+    symm_init = [init_val flip(init_val(2:end-1))];     % symmetric extension
+    L_ = 2*L;                                           
+    f_coeffs = 1/length(symm_init)*real(fft(symm_init));
+    f_coeffs(2:end) = 2*f_coeffs(2:end);
+
+    data = zeros(size(xx));
+
+    for s = 1:n_coeffs
+        data = data + f_coeffs(s).*exp(-4*((s-1)/L_*pi)^2*tt*a).*cos(2*pi*(s-1)*xx/L_);
     end
 end

@@ -10,19 +10,13 @@ function sys = ho_fd_DMD(X1, X2)
     S(1, 2, 6) = 1;
     S(1, 3, 7) = 1;
     S(2, 3, 8) = 1;
-    S(2, 4, 9) = 1;
-    S(N, N-1, 10) = 1;
-    S(N, N-2, 11) = 1;
-    S(N-1, N-2, 12) = 1;
-    S(N-1, N-3, 13) = 1;
-    S(1, 1, 14) = 1;
-    S(2, 2, 15) = 1;
-    S(3, 3, 16) = 1;
-    S(N, N, 17) = 1;
-    S(N-1, N-1, 18) = 1;
-    S(N-2, N-2, 19) = 1;
-    S(:, :, 20) = toeplitz(I(:, 4), 0*I(:, 4));
-    S(:, :, 21) = toeplitz(0*I(:, 4), I(:, 4));
+    S(N, N-1, 9) = 1;
+    S(N, N-2, 10) = 1;
+    S(N-1, N-2, 11) = 1;
+    S(1, 1, 12) = 1;
+    S(2, 2, 13) = 1;
+    S(3, 3, 14) = 1;
+    S(N, N, 15) = 1;
     Q = size(S, 3);
     Z = zeros(Q);
     c = zeros([Q, 1]);
@@ -33,8 +27,6 @@ function sys = ho_fd_DMD(X1, X2)
         c(k) = trace(X1'*S(:, :, k)'*X2);
     end
     Z = Z + Z' - diag(diag(Z));
-    % imagesc(Z)
-    % pause()
     a = pinv(Z)*c;
     sys = 0;
     for q = 1:Q
