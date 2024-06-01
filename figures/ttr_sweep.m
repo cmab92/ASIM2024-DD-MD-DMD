@@ -3,19 +3,18 @@ addpath '/home/bonenberger/matlab/DMD/ASIM'
 %%
 rng(1);
 %% gen. data
-n_samples_x = 21;
+n_samples_x = 11;
 k = 401;  % W/(m*K) thermal conductivity (copper)
 c = 385;  % J/(kg*K) specific thermal capacity (copper)
 r = 8.96; % kg/(m^3), mass density (copper)    
 a = k/(r*c); % diffusivity constant
 %%
 f = 1;  % control sampling (stability condition)
-train_test_ratio = 0.1;
+train_test_ratio = 0.25;
 %%
-n_iter = 500;
+n_iter = 1000;
 noise_lvl = 0.005;
 num_methods = 6;
-% sweep_var = 0.25:0.25:4; % sampling cond.
 sweep_var = 0.05:0.05:0.90; % train-test ratio
 sweep_len = length(sweep_var);
 pred_error = zeros([n_iter, sweep_len, num_methods]);
@@ -77,12 +76,12 @@ for iter = 1:n_iter
         clean_data = clean_data(train_size+1:end);
         %% error
         eps = 1e-16;
-        pred_error(iter, idx, 1) = sum(sum(abs(pred_sdmdfd - clean_data)./(abs(clean_data)+eps)));
-        pred_error(iter, idx, 2) = sum(sum(abs(pred_sdmdho - clean_data)./(abs(clean_data)+eps)));
-        pred_error(iter, idx, 3) = sum(sum(abs(pred_sdmdpe - clean_data)./(abs(clean_data)+eps)));
-        pred_error(iter, idx, 4) = sum(sum(abs(pred_pidmd - clean_data)./(abs(clean_data)+eps)));
-        pred_error(iter, idx, 5) = sum(sum(abs(pred_dmd - clean_data)./(abs(clean_data)+eps)));
-        pred_error(iter, idx, 6) = sum(sum(abs(pred_simulation - clean_data)./(abs(clean_data)+eps)));
+        pred_error(iter, idx, 1) = mean(mean(abs(pred_sdmdfd - clean_data)./(abs(clean_data)+eps)));
+        pred_error(iter, idx, 2) = mean(mean(abs(pred_sdmdho - clean_data)./(abs(clean_data)+eps)));
+        pred_error(iter, idx, 3) = mean(mean(abs(pred_sdmdpe - clean_data)./(abs(clean_data)+eps)));
+        pred_error(iter, idx, 4) = mean(mean(abs(pred_pidmd - clean_data)./(abs(clean_data)+eps)));
+        pred_error(iter, idx, 5) = mean(mean(abs(pred_dmd - clean_data)./(abs(clean_data)+eps)));
+        pred_error(iter, idx, 6) = mean(mean(abs(pred_simulation - clean_data)./(abs(clean_data)+eps)));
     end
 end
 pred_var = zeros([sweep_len, num_methods]);
@@ -123,7 +122,7 @@ legend()
 % % % % % % % % save_file(ana_data, strcat("raw_", num2str(noise_lvl), ".csv"), path)
 % % % % % % % % % % % % % % save_file(data, strcat("noisy_", num2str(noise_lvl), ".csv"), path)
 %% clean
-threshold = 10000;
+threshold = 1e3;
 for idx = 1:sweep_len
     for i = 1:num_methods
         if pred_var(idx, i) > threshold

@@ -10,7 +10,7 @@ function data = analytical_solution(N, a, f, init)
     [tt, xx] = meshgrid((0:dt:Tf), xgrid);
 
     %% 
-    n_coeffs = 5000;
+    n_coeffs = 10000;
     sample = linspace(0,1,n_coeffs);
     init_val = init(sample);
     symm_init = [init_val flip(init_val(2:end-1))];     % symmetric extension
