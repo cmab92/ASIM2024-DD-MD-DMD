@@ -3,7 +3,7 @@ addpath '/home/bonenberger/matlab/DMD/ASIM'
 %%
 rng(1);
 %% gen. data
-n_samples_x = 11;
+n_samples_x = 21;
 k = 401;  % W/(m*K) thermal conductivity (copper)
 c = 385;  % J/(kg*K) specific thermal capacity (copper)
 r = 8.96; % kg/(m^3), mass density (copper)    
@@ -12,10 +12,10 @@ a = k/(r*c); % diffusivity constant
 f = 1;  % control sampling (stability condition)
 train_test_ratio = 0.25;
 %%
-n_iter = 1000;
+n_iter = 100;
 noise_lvl = 0.005;
 num_methods = 6;
-sweep_var = 0.05:0.05:0.90; % train-test ratio
+sweep_var = 0.05:0.05:0.70; % train-test ratio
 sweep_len = length(sweep_var);
 pred_error = zeros([n_iter, sweep_len, num_methods]);
 for iter = 1:n_iter
@@ -84,68 +84,46 @@ for iter = 1:n_iter
         pred_error(iter, idx, 6) = mean(mean(abs(pred_simulation - clean_data)./(abs(clean_data)+eps)));
     end
 end
-pred_var = zeros([sweep_len, num_methods]);
-pred_mean = zeros([sweep_len, num_methods]);
+pred_median = zeros([sweep_len, num_methods]);
 pred_min = zeros([sweep_len, num_methods]);
 pred_max = zeros([sweep_len, num_methods]);
 for idx = 1:sweep_len
     for i = 1:num_methods
-        pred_var(idx, i) = var(pred_error(:, idx, i));
-        pred_mean(idx, i) = mean(pred_error(:, idx, i));
+        pred_median(idx, i) = median(pred_error(:, idx, i));
         pred_min(idx, i) = min(pred_error(:, idx, i));
         pred_max(idx, i) = max(pred_error(:, idx, i));
     end
 end
 %%
 figure()
-plot(pred_mean(:, 1), 'Displayname', 'sDMD', 'color', 'b'), hold on;
+plot(pred_median(:, 1), 'Displayname', 'sDMD', 'color', 'b'), hold on;
 plot(pred_min(:, 1), 'b', 'linestyle', ':', 'Displayname', '...')
 plot(pred_max(:, 1), 'b', 'linestyle', ':', 'Displayname', '...')
-plot(pred_mean(:, 2), 'Displayname', 'sDMD (ho)', 'color', 'c'), hold on;
+plot(pred_median(:, 2), 'Displayname', 'sDMD (ho)', 'color', 'c'), hold on;
 plot(pred_min(:, 2), 'c', 'linestyle', ':', 'Displayname', '...')
 plot(pred_max(:, 2), 'c', 'linestyle', ':', 'Displayname', '...')
-plot(pred_mean(:, 3), 'Displayname', 'sDMD (pe)', 'color', 'k'), hold on;
+plot(pred_median(:, 3), 'Displayname', 'sDMD (pe)', 'color', 'k'), hold on;
 plot(pred_min(:, 3), 'k', 'linestyle', ':', 'Displayname', '...')
 plot(pred_max(:, 3), 'k', 'linestyle', ':', 'Displayname', '...')
-plot(pred_mean(:, 4), 'Displayname', 'piDMD', 'color', 'g');
+plot(pred_median(:, 4), 'Displayname', 'piDMD', 'color', 'g');
 plot(pred_min(:, 4), 'g', 'linestyle', ':', 'Displayname', '...')
 plot(pred_max(:, 4), 'g', 'linestyle', ':', 'Displayname', '...')
-plot(pred_mean(:, 5), 'Displayname', 'DMD', 'color', 'r');
+plot(pred_median(:, 5), 'Displayname', 'DMD', 'color', 'r');
 plot(pred_min(:, 5), 'r', 'linestyle', ':', 'Displayname', '...')
 plot(pred_max(:, 5), 'r', 'linestyle', ':', 'Displayname', '...')
-plot(pred_mean(:, 6), 'Displayname', 'Simulation', 'color', 'y');
+plot(pred_median(:, 6), 'Displayname', 'Simulation', 'color', 'y');
 plot(pred_min(:, 6), 'r', 'linestyle', ':', 'Displayname', '...')
 plot(pred_max(:, 6), 'r', 'linestyle', ':', 'Displayname', '...')
 title("prediction error")
-ylim([0, 1000])
+ylim([0, 1])
 legend()
-% % % % % % % % save_file(ana_data, strcat("raw_", num2str(noise_lvl), ".csv"), path)
-% % % % % % % % % % % % % % save_file(data, strcat("noisy_", num2str(noise_lvl), ".csv"), path)
-%% clean
-threshold = 1e3;
-for idx = 1:sweep_len
-    for i = 1:num_methods
-        if pred_var(idx, i) > threshold
-            pred_var(idx, i) = NaN;
-        end
-        if pred_mean(idx, i) > threshold
-            pred_mean(idx, i) = NaN;
-        end
-        if pred_min(idx, i) > threshold
-            pred_min(idx, i) = NaN;
-        end
-        if pred_max(idx, i) > threshold
-            pred_max(idx, i) = NaN;
-        end
-    end
-end
 %%
 folder = "/home/bonenberger/Dokumente/eigenePaper/ASIM/data/ttr_sweep/";
 sweep_var = sweep_var';
 %% FD-sDMD
 nr = 1;
 filename = strcat("fdsdmd_mean.dat");
-x_ = [sweep_var, pred_mean(:, nr)];
+x_ = [sweep_var, pred_median(:, nr)];
 save(strcat(folder, filename), 'x_', '-ascii');
 filename = strcat("fdsdmd_min.dat");
 x_ = [sweep_var, pred_min(:, nr)];
@@ -156,7 +134,7 @@ save(strcat(folder, filename), 'x_', '-ascii');
 %% HO-sDMD
 nr = 2;
 filename = strcat("hosdmd_mean.dat");
-x_ = [sweep_var, pred_mean(:, nr)];
+x_ = [sweep_var, pred_median(:, nr)];
 save(strcat(folder, filename), 'x_', '-ascii');
 filename = strcat("hosdmd_min.dat");
 x_ = [sweep_var, pred_min(:, nr)];
@@ -167,7 +145,7 @@ save(strcat(folder, filename), 'x_', '-ascii');
 %% PE-sDMD
 nr = 3;
 filename = strcat("pesdmd_mean.dat");
-x_ = [sweep_var, pred_mean(:, nr)];
+x_ = [sweep_var, pred_median(:, nr)];
 save(strcat(folder, filename), 'x_', '-ascii');
 filename = strcat("pesdmd_min.dat");
 x_ = [sweep_var, pred_min(:, nr)];
@@ -178,7 +156,7 @@ save(strcat(folder, filename), 'x_', '-ascii');
 %% piDMD
 nr = 4;
 filename = strcat("pidmd_mean.dat");
-x_ = [sweep_var, pred_mean(:, nr)];
+x_ = [sweep_var, pred_median(:, nr)];
 save(strcat(folder, filename), 'x_', '-ascii');
 filename = strcat("pidmd_min.dat");
 x_ = [sweep_var, pred_min(:, nr)];
@@ -189,7 +167,7 @@ save(strcat(folder, filename), 'x_', '-ascii');
 %% DMD
 nr = 5;
 filename = strcat("dmd_mean.dat");
-x_ = [sweep_var, pred_mean(:, nr)];
+x_ = [sweep_var, pred_median(:, nr)];
 save(strcat(folder, filename), 'x_', '-ascii');
 filename = strcat("dmd_min.dat");
 x_ = [sweep_var, pred_min(:, nr)];
@@ -200,7 +178,7 @@ save(strcat(folder, filename), 'x_', '-ascii');
 %% simulation
 nr = 6;
 filename = strcat("sim_mean.dat");
-x_ = [sweep_var, pred_mean(:, nr)];
+x_ = [sweep_var, pred_median(:, nr)];
 save(strcat(folder, filename), 'x_', '-ascii');
 filename = strcat("sim_min.dat");
 x_ = [sweep_var, pred_min(:, nr)];
