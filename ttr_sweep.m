@@ -1,5 +1,4 @@
 close all; clear all; clc; 
-addpath '/home/bonenberger/matlab/DMD/ASIM'
 %%
 rng(1);
 %% gen. data
@@ -96,96 +95,27 @@ for idx = 1:sweep_len
 end
 %%
 figure()
-plot(pred_median(:, 1), 'Displayname', 'sDMD', 'color', 'b'), hold on;
-plot(pred_min(:, 1), 'b', 'linestyle', ':', 'Displayname', '...')
-plot(pred_max(:, 1), 'b', 'linestyle', ':', 'Displayname', '...')
-plot(pred_median(:, 2), 'Displayname', 'sDMD (ho)', 'color', 'c'), hold on;
-plot(pred_min(:, 2), 'c', 'linestyle', ':', 'Displayname', '...')
-plot(pred_max(:, 2), 'c', 'linestyle', ':', 'Displayname', '...')
-plot(pred_median(:, 3), 'Displayname', 'sDMD (pe)', 'color', 'k'), hold on;
-plot(pred_min(:, 3), 'k', 'linestyle', ':', 'Displayname', '...')
-plot(pred_max(:, 3), 'k', 'linestyle', ':', 'Displayname', '...')
-plot(pred_median(:, 4), 'Displayname', 'piDMD', 'color', 'g');
-plot(pred_min(:, 4), 'g', 'linestyle', ':', 'Displayname', '...')
-plot(pred_max(:, 4), 'g', 'linestyle', ':', 'Displayname', '...')
-plot(pred_median(:, 5), 'Displayname', 'DMD', 'color', 'r');
-plot(pred_min(:, 5), 'r', 'linestyle', ':', 'Displayname', '...')
-plot(pred_max(:, 5), 'r', 'linestyle', ':', 'Displayname', '...')
-plot(pred_median(:, 6), 'Displayname', 'Simulation', 'color', 'y');
-plot(pred_min(:, 6), 'r', 'linestyle', ':', 'Displayname', '...')
-plot(pred_max(:, 6), 'r', 'linestyle', ':', 'Displayname', '...')
+plot(sweep_var, pred_median(:, 1), 'Displayname', 'sDMD', 'color', 'b'), hold on;
+plot(sweep_var, pred_min(:, 1), 'b', 'linestyle', ':', 'Displayname', '...')
+plot(sweep_var, pred_max(:, 1), 'b', 'linestyle', ':', 'Displayname', '...')
+plot(sweep_var, pred_median(:, 2), 'Displayname', 'sDMD (ho)', 'color', 'c'), hold on;
+plot(sweep_var, pred_min(:, 2), 'c', 'linestyle', ':', 'Displayname', '...')
+plot(sweep_var, pred_max(:, 2), 'c', 'linestyle', ':', 'Displayname', '...')
+plot(sweep_var, pred_median(:, 3), 'Displayname', 'sDMD (pe)', 'color', 'k'), hold on;
+plot(sweep_var, pred_min(:, 3), 'k', 'linestyle', ':', 'Displayname', '...')
+plot(sweep_var, pred_max(:, 3), 'k', 'linestyle', ':', 'Displayname', '...')
+plot(sweep_var, pred_median(:, 4), 'Displayname', 'piDMD', 'color', 'g');
+plot(sweep_var, pred_min(:, 4), 'g', 'linestyle', ':', 'Displayname', '...')
+plot(sweep_var, pred_max(:, 4), 'g', 'linestyle', ':', 'Displayname', '...')
+plot(sweep_var, pred_median(:, 5), 'Displayname', 'DMD', 'color', 'r');
+plot(sweep_var, pred_min(:, 5), 'r', 'linestyle', ':', 'Displayname', '...')
+plot(sweep_var, pred_max(:, 5), 'r', 'linestyle', ':', 'Displayname', '...')
+plot(sweep_var, pred_median(:, 6), 'Displayname', 'Simulation', 'color', 'y');
+plot(sweep_var, pred_min(:, 6), 'r', 'linestyle', ':', 'Displayname', '...')
+plot(sweep_var, pred_max(:, 6), 'r', 'linestyle', ':', 'Displayname', '...')
 title("prediction error")
 ylim([0, 1])
 legend()
-%%
-folder = "/home/bonenberger/Dokumente/eigenePaper/ASIM/data/ttr_sweep/";
-sweep_var = sweep_var';
-%% FD-sDMD
-nr = 1;
-filename = strcat("fdsdmd_mean.dat");
-x_ = [sweep_var, pred_median(:, nr)];
-save(strcat(folder, filename), 'x_', '-ascii');
-filename = strcat("fdsdmd_min.dat");
-x_ = [sweep_var, pred_min(:, nr)];
-save(strcat(folder, filename), 'x_', '-ascii');
-filename = strcat("fdsdmd_max.dat");
-x_ = [sweep_var, pred_max(:, nr)];
-save(strcat(folder, filename), 'x_', '-ascii');
-%% HO-sDMD
-nr = 2;
-filename = strcat("hosdmd_mean.dat");
-x_ = [sweep_var, pred_median(:, nr)];
-save(strcat(folder, filename), 'x_', '-ascii');
-filename = strcat("hosdmd_min.dat");
-x_ = [sweep_var, pred_min(:, nr)];
-save(strcat(folder, filename), 'x_', '-ascii');
-filename = strcat("hosdmd_max.dat");
-x_ = [sweep_var, pred_max(:, nr)];
-save(strcat(folder, filename), 'x_', '-ascii');
-%% PE-sDMD
-nr = 3;
-filename = strcat("pesdmd_mean.dat");
-x_ = [sweep_var, pred_median(:, nr)];
-save(strcat(folder, filename), 'x_', '-ascii');
-filename = strcat("pesdmd_min.dat");
-x_ = [sweep_var, pred_min(:, nr)];
-save(strcat(folder, filename), 'x_', '-ascii');
-filename = strcat("pesdmd_max.dat");
-x_ = [sweep_var, pred_max(:, nr)];
-save(strcat(folder, filename), 'x_', '-ascii');
-%% piDMD
-nr = 4;
-filename = strcat("pidmd_mean.dat");
-x_ = [sweep_var, pred_median(:, nr)];
-save(strcat(folder, filename), 'x_', '-ascii');
-filename = strcat("pidmd_min.dat");
-x_ = [sweep_var, pred_min(:, nr)];
-save(strcat(folder, filename), 'x_', '-ascii');
-filename = strcat("pidmd_max.dat");
-x_ = [sweep_var, pred_max(:, nr)];
-save(strcat(folder, filename), 'x_', '-ascii');
-%% DMD
-nr = 5;
-filename = strcat("dmd_mean.dat");
-x_ = [sweep_var, pred_median(:, nr)];
-save(strcat(folder, filename), 'x_', '-ascii');
-filename = strcat("dmd_min.dat");
-x_ = [sweep_var, pred_min(:, nr)];
-save(strcat(folder, filename), 'x_', '-ascii');
-filename = strcat("dmd_max.dat");
-x_ = [sweep_var, pred_max(:, nr)];
-save(strcat(folder, filename), 'x_', '-ascii');
-%% simulation
-nr = 6;
-filename = strcat("sim_mean.dat");
-x_ = [sweep_var, pred_median(:, nr)];
-save(strcat(folder, filename), 'x_', '-ascii');
-filename = strcat("sim_min.dat");
-x_ = [sweep_var, pred_min(:, nr)];
-save(strcat(folder, filename), 'x_', '-ascii');
-filename = strcat("sim_max.dat");
-x_ = [sweep_var, pred_max(:, nr)];
-save(strcat(folder, filename), 'x_', '-ascii');
 %%
 function system = md_fd_system(N, a, f)
     L = 1; % length
@@ -197,25 +127,4 @@ function system = md_fd_system(N, a, f)
     D(1,2) = 2;
     D(N,N-1) = 2;    
     system = dt*a*D/dx^2 + eye(N);       % p. 179, eq. 5.132
-end
-function save_file(X, filename, path)
-    X(isinf(X)) = 0;
-    X_ = X(:, 1:end);
-    X_ = X_(1:end, :);
-    [xx_, yy_] = meshgrid((0:size(X_, 2)-1), (0:size(X_, 1)-1));
-    x = round([xx_(:), yy_(:), X_(:)], 8);
-    
-    fid = fopen(strcat(path, filename),'w');   
-    fprintf(fid,' ');
-    fclose(fid);
-    fid = fopen(strcat(path, filename),'a'); 
-    for i = 1:size(x, 1)
-        if x(i, 2) == 0
-            fprintf(fid, '\n');
-        end
-        fprintf(fid,'%i ',x(i, 1:2));
-        fprintf(fid,'%.4f ',x(i, 3));
-        fprintf(fid, '\n');
-    end
-    fclose(fid);
 end
